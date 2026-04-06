@@ -186,8 +186,21 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{
     background: #7C3AED !important; box-shadow: 0 4px 12px rgba(139,92,246,0.4) !important;
     transform: translateY(-1px) !important;
 }}
+.btn-download-indigo .stDownloadButton > button {{
+    background: #6366F1 !important;
+    border: none !important; border-radius: 8px !important; padding: 0.6rem 1.2rem !important;
+    font-family: 'Inter', sans-serif !important; font-weight: 600 !important;
+    font-size: 0.875rem !important; width: 100% !important; color: #fff !important;
+    box-shadow: 0 1px 3px rgba(99,102,241,0.3) !important; transition: all 0.18s !important;
+}}
+.btn-download-indigo .stDownloadButton > button:hover {{
+    background: #4F46E5 !important; box-shadow: 0 4px 12px rgba(99,102,241,0.4) !important;
+    transform: translateY(-1px) !important;
+}}
 
-/* Force override ALL Streamlit red/orange accent colors → theme blue */
+/* ══ Force ALL Streamlit red/orange → theme blue #0EA5E9 ══ */
+
+/* Primary button */
 .stButton > button[kind="primary"] {{
     background: #0EA5E9 !important; border-color: #0EA5E9 !important;
 }}
@@ -195,56 +208,58 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{
     background: transparent !important; color: #475569 !important;
     border-color: #E2E8F0 !important;
 }}
-/* Radio buttons */
-[data-testid="stRadio"] [data-testid="stWidgetLabel"] {{ color: #475569 !important; }}
-[data-baseweb="radio"] [data-checked="true"] div:first-child {{
-    background-color: #0EA5E9 !important; border-color: #0EA5E9 !important;
+
+/* ── Radio: JS handles dot color to avoid collateral blue backgrounds ── */
+
+/* ── Slider: thumb, filled track, tooltip ── */
+/* Thumb (handle) */
+div[data-baseweb="slider"] [role="slider"] {{
+    background: #0EA5E9 !important;
+    border-color: #0EA5E9 !important;
+    box-shadow: 0 0 0 4px rgba(14,165,233,.18) !important;
 }}
-[data-baseweb="radio"] div:first-child {{
-    border-color: #CBD5E1 !important;
-}}
-[data-baseweb="radio"] div:focus-within div:first-child {{
-    border-color: #0EA5E9 !important; box-shadow: 0 0 0 3px rgba(14,165,233,.15) !important;
-}}
-/* Slider */
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background: #0EA5E9 !important; border-color: #0EA5E9 !important;
-}}
-[data-testid="stSlider"] [data-baseweb="slider"] div[data-baseweb="slider"] > div:nth-child(3) {{
+/* Filled portion of track (the colored left part) */
+div[data-baseweb="slider"] > div > div > div:nth-child(4),
+div[data-baseweb="slider"] > div > div > div:nth-child(3) {{
     background: #0EA5E9 !important;
 }}
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"]:focus {{
-    box-shadow: 0 0 0 4px rgba(14,165,233,.2) !important;
+/* All inner track-fill divs — belt-and-suspenders */
+div[data-baseweb="slider"] div[style*="background-color: rgb(255"] {{
+    background-color: #0EA5E9 !important;
 }}
-/* Filled track of slider */
-div[data-baseweb="slider"] div[data-testid="stTickBarMin"] ~ div > div > div:first-child {{
+div[data-baseweb="slider"] div[style*="background: rgb(255"] {{
     background: #0EA5E9 !important;
 }}
-/* Selectbox / multiselect focus ring */
+/* Tooltip bubble above thumb */
+div[data-baseweb="slider"] [data-baseweb="tooltip"] div {{
+    background: #0EA5E9 !important;
+}}
+/* Streamlit's own slider inner fill via CSS var override */
+[data-testid="stSlider"] * {{ --primary: #0EA5E9 !important; }}
+
+/* ── Selectbox / multiselect tags ── */
 [data-baseweb="select"] [data-baseweb="tag"] {{
     background-color: #E0F2FE !important; color: #0284C7 !important;
 }}
 [data-baseweb="select"] [data-baseweb="tag"] span {{ color: #0284C7 !important; }}
-[data-baseweb="select"]:focus-within {{
-    border-color: #0EA5E9 !important;
-}}
-/* Multiselect tags (x button) */
-[data-baseweb="tag"] [data-baseweb="tag-action"] svg path {{
-    fill: #0284C7 !important;
-}}
-/* Number input focus */
+[data-baseweb="tag"] [data-baseweb="tag-action"] svg path {{ fill: #0284C7 !important; }}
+
+/* ── Input focus ── */
 input[type="number"]:focus, input[type="text"]:focus, textarea:focus {{
     border-color: #0EA5E9 !important;
     box-shadow: 0 0 0 2px rgba(14,165,233,.15) !important;
 }}
-/* Checkbox */
+/* ── Checkbox ── */
 [data-baseweb="checkbox"] [data-checked="true"] span {{
     background-color: #0EA5E9 !important; border-color: #0EA5E9 !important;
 }}
-/* Progress / spinner accent */
+/* ── Progress bar ── */
 .stProgress > div > div {{ background-color: #0EA5E9 !important; }}
-/* st.info, st.success, st.warning use custom colors */
-[data-testid="stNotification"] {{ border-color: #BAE6FD !important; }}
+/* ── Streamlit global CSS variable (overrides theme token) ── */
+:root {{
+    --primary-color: #0EA5E9 !important;
+    --secondary-color: #0284C7 !important;
+}}
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {{
@@ -479,6 +494,68 @@ input, textarea {{ background: #F8FAFC !important; border-radius:8px !important;
 }}
 .landing-sub {{ text-align:center; color:#64748B; font-size:1rem; margin-bottom:1.8rem; }}
 </style>
+<script>
+(function patchRed() {{
+    var BLUE = '#0EA5E9';
+    var RED_PATTERNS = [
+        'rgb(255, 75, 75)', 'rgb(255,75,75)',
+        '#ff4b4b', '#FF4B4B', 'red',
+        'rgb(255, 49, 49)', 'rgb(229, 61, 61)'
+    ];
+
+    function isRed(v) {{
+        if (!v) return false;
+        for (var i = 0; i < RED_PATTERNS.length; i++) {{
+            if (v === RED_PATTERNS[i]) return true;
+        }}
+        // catch rgb(255, XX, XX) pattern broadly
+        return /rgb\(25[0-9],\s*[0-9]{{1,2}},\s*[0-9]{{1,2}}\)/.test(v);
+    }}
+
+    function fixEl(el) {{
+        if (!el || el.nodeType !== 1) return;
+        var props = ['backgroundColor','background','borderColor',
+                     'borderTopColor','borderBottomColor','borderLeftColor',
+                     'borderRightColor','fill','stroke'];
+        props.forEach(function(p) {{
+            if (isRed(el.style[p])) el.style[p] = BLUE;
+        }});
+        // SVG fill attribute
+        var fillAttr = el.getAttribute && el.getAttribute('fill');
+        if (fillAttr && isRed(fillAttr)) el.setAttribute('fill', BLUE);
+    }}
+
+    function runAll() {{
+        document.querySelectorAll('*').forEach(fixEl);
+    }}
+
+    var mo = new MutationObserver(function(muts) {{
+        muts.forEach(function(m) {{
+            m.addedNodes.forEach(function(n) {{
+                if (n.nodeType === 1) {{
+                    fixEl(n);
+                    n.querySelectorAll('*').forEach(fixEl);
+                }}
+            }});
+            if (m.type === 'attributes') fixEl(m.target);
+        }});
+    }});
+
+    function init() {{
+        mo.observe(document.body, {{
+            childList: true, subtree: true,
+            attributes: true, attributeFilter: ['style','fill','stroke']
+        }});
+        runAll();
+    }}
+
+    if (document.body) init();
+    else document.addEventListener('DOMContentLoaded', init);
+    setTimeout(runAll, 400);
+    setTimeout(runAll, 1200);
+    setTimeout(runAll, 3000);
+}})();
+</script>
 """, unsafe_allow_html=True)
 
 inject_css()
@@ -642,7 +719,7 @@ elif st.session_state['screen'] == 'overview':
             f'</tr></thead><tbody>{rows_html}</tbody></table></div>',
             unsafe_allow_html=True)
         st.markdown('<div style="height:0.8rem"></div>', unsafe_allow_html=True)
-        with st.expander("Show Data Preview"):
+        with st.expander("Show Data Preview (up to 500 rows)"):
             st.dataframe(df.head(500), use_container_width=True)
 
     with tab_num:
@@ -879,7 +956,7 @@ elif st.session_state['screen'] == 'studio':
             ("cat",      "🏷️", "Categorical",       "Standardize text, map values, or OHE."),
             ("outliers", "📐", "Outliers",          "Detect and cap/remove statistical outliers."),
             ("norm",     "📏", "Normalization",     "Scale features using Min-Max or Z-Score."),
-            ("colops",   "🔩", "Column Operations",        "Rename, drop, or create new calculated columns."),
+            ("colops",   "🔩", "Column Ops",        "Rename, drop, or create new calculated columns."),
             ("val",      "✅", "Validation",        "Check data integrity and constraints."),
         ]
 
@@ -908,7 +985,7 @@ elif st.session_state['screen'] == 'studio':
                             f'</div>',
                             unsafe_allow_html=True)
                         st.markdown('<div class="func-card-btn">', unsafe_allow_html=True)
-                        if st.button("Open", key=f"btn_nav_{sid}", use_container_width=True):
+                        if st.button("선택 →", key=f"btn_nav_{sid}", use_container_width=True):
                             st.session_state['clean_section'] = sid
                             st.rerun()
                         st.markdown('</div>', unsafe_allow_html=True)
@@ -1173,7 +1250,7 @@ elif st.session_state['screen'] == 'studio':
                             f'</div>',
                             unsafe_allow_html=True)
                         st.markdown('<div class="func-card-btn">', unsafe_allow_html=True)
-                        if st.button("Open", key=f"pick_{cid}", use_container_width=True):
+                        if st.button("선택 →", key=f"pick_{cid}", use_container_width=True):
                             st.session_state['viz_selected'] = cid; st.rerun()
                         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1370,21 +1447,44 @@ elif st.session_state['screen'] == 'studio':
                 if fig is not None:
                     fig.update_layout(**lk)
                     st.plotly_chart(fig, use_container_width=True)
-                    dl1, dl2, _ = st.columns([1, 1, 4])
+
+                    ts_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    dl1, dl2, dl3, _ = st.columns([1, 1, 1, 3])
+
+                    # ── PNG (requires kaleido) ──
                     with dl1:
                         try:
+                            import kaleido  # noqa: check availability
+                            png_bytes = fig.to_image(format="png", width=1200, height=700, scale=2)
                             st.markdown('<div class="btn-download">', unsafe_allow_html=True)
-                            st.download_button("⬇️ PNG", fig.to_image(format="png",width=1200,height=700,scale=2),
-                                f"{cid}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png","image/png",key="dl_png")
+                            st.download_button("⬇️ PNG", png_bytes,
+                                f"{cid}_{ts_str}.png", "image/png", key="dl_png")
                             st.markdown('</div>', unsafe_allow_html=True)
-                        except: pass
+                        except Exception:
+                            st.markdown(
+                                '<div style="font-size:0.7rem;color:#94A3B8;padding-top:0.4rem">'
+                                'PNG: install<br><code>kaleido</code></div>',
+                                unsafe_allow_html=True)
+
+                    # ── SVG (requires kaleido) ──
                     with dl2:
                         try:
+                            import kaleido  # noqa
+                            svg_bytes = fig.to_image(format="svg")
                             st.markdown('<div class="btn-download-purple">', unsafe_allow_html=True)
-                            st.download_button("⬇️ SVG", fig.to_image(format="svg"),
-                                f"{cid}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg","image/svg+xml",key="dl_svg")
+                            st.download_button("⬇️ SVG", svg_bytes,
+                                f"{cid}_{ts_str}.svg", "image/svg+xml", key="dl_svg")
                             st.markdown('</div>', unsafe_allow_html=True)
-                        except: pass
+                        except Exception:
+                            pass
+
+                    # ── HTML (always works, no extra dependency) ──
+                    with dl3:
+                        html_bytes = fig.to_html(include_plotlyjs="cdn").encode("utf-8")
+                        st.markdown('<div class="btn-download-indigo">', unsafe_allow_html=True)
+                        st.download_button("⬇️ HTML", html_bytes,
+                            f"{cid}_{ts_str}.html", "text/html", key="dl_html")
+                        st.markdown('</div>', unsafe_allow_html=True)
 
     # ═══════════════════════════════════════════════════════════════
     # EXPORT
