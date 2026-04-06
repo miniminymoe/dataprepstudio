@@ -1446,40 +1446,30 @@ elif st.session_state['screen'] == 'studio':
 
                 if fig is not None:
                     fig.update_layout(**lk)
-                    st.plotly_chart(fig, use_container_width=True)
-
                     ts_str = datetime.now().strftime('%Y%m%d_%H%M%S')
-                    dl1, dl2, dl3, _ = st.columns([1, 1, 1, 3])
 
-                    # ── PNG (requires kaleido) ──
-                    with dl1:
-                        try:
-                            import kaleido  # noqa: check availability
-                            png_bytes = fig.to_image(format="png", width=1200, height=700, scale=2)
-                            st.markdown('<div class="btn-download">', unsafe_allow_html=True)
-                            st.download_button("⬇️ PNG", png_bytes,
-                                f"{cid}_{ts_str}.png", "image/png", key="dl_png")
-                            st.markdown('</div>', unsafe_allow_html=True)
-                        except Exception:
-                            st.markdown(
-                                '<div style="font-size:0.7rem;color:#94A3B8;padding-top:0.4rem">'
-                                'PNG: install<br><code>kaleido</code></div>',
-                                unsafe_allow_html=True)
+                    # Plotly built-in PNG download (no kaleido needed — runs in browser)
+                    st.plotly_chart(fig, use_container_width=True, config={
+                        'toImageButtonOptions': {
+                            'format': 'png',
+                            'filename': f'{cid}_{ts_str}',
+                            'height': 700,
+                            'width': 1200,
+                            'scale': 2,
+                        },
+                        'displayModeBar': True,
+                        'modeBarButtonsToRemove': [
+                            'zoom2d','pan2d','select2d','lasso2d',
+                            'zoomIn2d','zoomOut2d','autoScale2d',
+                            'hoverClosestCartesian','hoverCompareCartesian',
+                            'toggleSpikelines',
+                        ],
+                        'displaylogo': False,
+                    })
 
-                    # ── SVG (requires kaleido) ──
-                    with dl2:
-                        try:
-                            import kaleido  # noqa
-                            svg_bytes = fig.to_image(format="svg")
-                            st.markdown('<div class="btn-download-purple">', unsafe_allow_html=True)
-                            st.download_button("⬇️ SVG", svg_bytes,
-                                f"{cid}_{ts_str}.svg", "image/svg+xml", key="dl_svg")
-                            st.markdown('</div>', unsafe_allow_html=True)
-                        except Exception:
-                            pass
-
-                    # ── HTML (always works, no extra dependency) ──
-                    with dl3:
+                    # ── HTML download (always works) ──
+                    dl_col, _ = st.columns([1, 5])
+                    with dl_col:
                         html_bytes = fig.to_html(include_plotlyjs="cdn").encode("utf-8")
                         st.markdown('<div class="btn-download-indigo">', unsafe_allow_html=True)
                         st.download_button("⬇️ HTML", html_bytes,
